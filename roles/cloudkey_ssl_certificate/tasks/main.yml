@@ -29,11 +29,11 @@
   when: ssl_cert.changed or ssl_key.changed
 
 - name: Delete old alias from local keystore.
-  command: "/usr/bin/keytool -delete -alias unifi -keystore {{ keystore_file }} -storepass {{ keystore_password }}"
+ command: "/usr/bin/keytool -delete -alias unifi -keystore {{ keystore_file }} -storepass {{ keystore_password }}"
   when: pfx_file.changed
 
 - name: Import PFX file into local keystore.
-  command: "/usr/bin/keytool -importkeystore -srckeystore {{ cloudkey_ssl_pfx_file }} -srcstoretype PKCS12 -srcstorepass {{ keystore_password }} -destkeystore {{ keystore_file }} -storepass {{ store_password }}"
+  command: "/usr/bin/keytool -importkeystore -srckeystore {{ cloudkey_ssl_pfx_file }} -srcstoretype PKCS12 -srcstorepass {{ keystore_password }} -destkeystore {{ keystore_file }} -storepass {{ keystore_password }}"
   register: keystore
   when: pfx_file.changed
   notify: restart unifi
