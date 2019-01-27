@@ -11,6 +11,7 @@
     group: root
     mode: 0644
   register: ssl_key
+  notify: restart nginx
 
 - name: Copy cloudkey SSL certificate.
   copy:
@@ -20,18 +21,20 @@
     group: root
     mode: 0644
   register: ssl_cert
+  notify: restart nginx
 
 - name: Rebuild PFX file from SSL key and certificate.
   command: "/usr/bin/openssl pkcs12 -export -in {{ cloudkey_ssl_cert_file }} -inkey {{ cloudkey_ssl_key_file }} -out {{ cloudkey_ssl_pfx_file }} -name unifi -password pass:aircontrolenterprise"
   register: pfx_file
-  # when: ssl_cert.changed or ssl_key.changed
+  when: ssl_cert.changed or ssl_key.changed
 
 - name: Delete old alias from local keystore.
   command: "/usr/bin/keytool -delete -alias unifi -keystore /etc/ssl/private/unifi.keystore.jks -storepass aircontrolenterprise"
-  # when: pfx_file.changed
+  when: pfx_file.changed
 
 - name: Import PFX file into local keystore.
   command: "/usr/bin/keytool -importkeystore -srckeystore {{ cloudkey_ssl_pfx_file }} -srcstoretype PKCS12 -srcstorepass aircontrolenterprise -destkeystore /etc/ssl/private/unifi.keystore.jks -storepass aircontrolenterprise"
   register: keystore
-  # when: pfx_file.changed
+  when: pfx_file.changed
+  notify: restart unifi
 
