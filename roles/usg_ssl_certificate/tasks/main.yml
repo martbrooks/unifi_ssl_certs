@@ -3,11 +3,15 @@
 
 - include_vars: vault.yaml
 
-- name: Copy USG server SSL PEM vault.
+- name: Copy USG server SSL PEM from vault.
   copy:
     content: "{{ usg_ssl_pem }}"
     dest: /etc/lighttpd/server.pem
     owner: root
     group: root
     mode: 0600
-  notify: restart lighttpd
+  register: cert_installed
+
+- command:
+    echo "Reboot your USG for the new certificate to be used."
+  when: cert_installed.changed

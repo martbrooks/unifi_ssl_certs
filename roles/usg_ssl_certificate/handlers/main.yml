@@ -1,7 +1,2 @@
 ---
 # handlers file for usg_ssl_certificate
-
-- name: restart lighttpd
-  service:
-    name: lighttpd
-    state: restarted

@@ -1,5 +1,5 @@
 
 - hosts: unifi_usg
-  become: false
+  become: true
   roles:
     - usg_ssl_certificate

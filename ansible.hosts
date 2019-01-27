@@ -3,4 +3,4 @@
 unifi.hinterlands.org
 
 [unifi_usg]
-gw.hinterlands.org
+gw.hinterlands.org ansible_user=admin
