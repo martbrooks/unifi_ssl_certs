@@ -24,16 +24,16 @@
   notify: restart nginx
 
 - name: Rebuild PFX file from SSL key and certificate.
-  command: "/usr/bin/openssl pkcs12 -export -in {{ cloudkey_ssl_cert_file }} -inkey {{ cloudkey_ssl_key_file }} -out {{ cloudkey_ssl_pfx_file }} -name unifi -password pass:aircontrolenterprise"
+  command: "/usr/bin/openssl pkcs12 -export -in {{ cloudkey_ssl_cert_file }} -inkey {{ cloudkey_ssl_key_file }} -out {{ cloudkey_ssl_pfx_file }} -name unifi -password pass:{{ keystore_password }}"
   register: pfx_file
   when: ssl_cert.changed or ssl_key.changed
 
 - name: Delete old alias from local keystore.
-  command: "/usr/bin/keytool -delete -alias unifi -keystore /etc/ssl/private/unifi.keystore.jks -storepass aircontrolenterprise"
+  command: "/usr/bin/keytool -delete -alias unifi -keystore {{ keystore_file }} -storepass {{ keystore_password }}"
   when: pfx_file.changed
 
 - name: Import PFX file into local keystore.
-  command: "/usr/bin/keytool -importkeystore -srckeystore {{ cloudkey_ssl_pfx_file }} -srcstoretype PKCS12 -srcstorepass aircontrolenterprise -destkeystore /etc/ssl/private/unifi.keystore.jks -storepass aircontrolenterprise"
+  command: "/usr/bin/keytool -importkeystore -srckeystore {{ cloudkey_ssl_pfx_file }} -srcstoretype PKCS12 -srcstorepass {{ keystore_password }} -destkeystore {{ keystore_file }} -storepass {{ store_password }}"
   register: keystore
   when: pfx_file.changed
   notify: restart unifi
