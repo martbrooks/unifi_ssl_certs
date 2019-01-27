@@ -1,2 +1,13 @@
 ---
 # tasks file for usg_ssl_certificate
+
+- include_vars: vault.yaml
+
+- name: Copy USG server SSL PEM vault.
+  copy:
+    content: "{{ usg_ssl_pem }}"
+    dest: /etc/lighttpd/server.pem
+    owner: root
+    group: root
+    mode: 0600
+  notify: restart lighttpd
