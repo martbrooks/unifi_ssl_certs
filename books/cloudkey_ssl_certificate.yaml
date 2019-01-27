@@ -1,0 +1,5 @@
+
+- hosts: unifi_cloudkey
+  become: false
+  roles:
+    - cloudkey_ssl_certificate
