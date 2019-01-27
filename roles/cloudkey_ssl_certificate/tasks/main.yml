@@ -1,2 +1,37 @@
 ---
 # tasks file for cloudkey_ssl_certificate
+
+- include_vars: vault.yaml
+
+- name: Copy cloudkey SSL key from vault.
+  copy:
+    content: "{{ cloudkey_ssl_key }}"
+    dest: "{{ cloudkey_ssl_key_file }}"
+    owner: root
+    group: root
+    mode: 0644
+  register: ssl_key
+
+- name: Copy cloudkey SSL certificate.
+  copy:
+    src: etc/ssl/private/cloudkey.crt
+    dest: "{{ cloudkey_ssl_cert_file }}"
+    owner: root
+    group: root
+    mode: 0644
+  register: ssl_cert
+
+- name: Rebuild PFX file from SSL key and certificate.
+  command: "/usr/bin/openssl pkcs12 -export -in {{ cloudkey_ssl_cert_file }} -inkey {{ cloudkey_ssl_key_file }} -out {{ cloudkey_ssl_pfx_file }} -name unifi -password pass:aircontrolenterprise"
+  register: pfx_file
+  # when: ssl_cert.changed or ssl_key.changed
+
+- name: Delete old alias from local keystore.
+  command: "/usr/bin/keytool -delete -alias unifi -keystore /etc/ssl/private/unifi.keystore.jks -storepass aircontrolenterprise"
+  # when: pfx_file.changed
+
+- name: Import PFX file into local keystore.
+  command: "/usr/bin/keytool -importkeystore -srckeystore {{ cloudkey_ssl_pfx_file }} -srcstoretype PKCS12 -srcstorepass aircontrolenterprise -destkeystore /etc/ssl/private/unifi.keystore.jks -storepass aircontrolenterprise"
+  register: keystore
+  # when: pfx_file.changed
+

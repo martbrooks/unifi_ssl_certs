@@ -1,2 +1,7 @@
 ---
 # vars file for cloudkey_ssl_certificate
+
+cloudkey_ssl_dir:       /etc/ssl/private
+cloudkey_ssl_key_file:  "{{ cloudkey_ssl_dir }}/cloudkey.key"
+cloudkey_ssl_cert_file: "{{ cloudkey_ssl_dir }}/cloudkey.crt"
+cloudkey_ssl_pfx_file:  "{{ cloudkey_ssl_dir }}/cloudkey.pfx"
