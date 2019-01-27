@@ -1,2 +1,13 @@
 ---
 # handlers file for cloudkey_ssl_certificate
+
+- name: restart unifi
+  service:
+    name: unifi
+    state: restarted
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+
